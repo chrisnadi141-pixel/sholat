@@ -3,13 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Display Jadwal Sholat - Masjid Jami' Baitul Muttaqien</title>
+<title>Display Jadwal Sholat - Masjid Jami' Baitul Muttaqin</title>
 
 <style>
 body{
   margin:0;
   padding:20px;
-  background:url("masjid1.jpg") no-repeat center center fixed;
+  background:url("masjid2.jpg") no-repeat center center fixed;
   background-size:cover;
   color:white;
   font-family:Arial, sans-serif;
@@ -131,9 +131,9 @@ th,td{
   <div><div id="jamDigital"></div></div>
 
   <div class="header-center">
-    <div id="masjidName">MASJID JAMI'<br>BAITUL MUTTAQIEN</div>
+    <div id="masjidName">MASJID JAMI'<br>BAITUL MUTTAQIN</div>
     <div id="alamatWrapper">
-      <div id="alamatMasjid">Kp. MASJID Kel. JOMBANG, CIPUTAT TANGSEL</div>
+      <div id="alamatMasjid">Kp. MASJID, Kel. JOMBANG, CIPUTAT, TANGSEL</div>
     </div>
   </div>
 
@@ -142,12 +142,10 @@ th,td{
     <marquee><div id="hijriDisplay"></div></marquee>
   </div>
 </div>
-
 <!-- HARI BESAR ISLAM -->
 <div id="hariBesarBox">
   <span id="hariBesarText">Memuat hari besar Islam...</span>
 </div>
-
 <!-- COUNTDOWN SHOLAT -->
 <div id="infoBox">
   <div id="countdown">Memuat waktu sholat...</div>
@@ -171,7 +169,7 @@ th,td{
 <!-- RUNNING TEXT -->
 <div id="marqueeBox">
 <span id="marqueeText">
-Selamat datang di Masjid Jami' Baitul Muttaqien — Sholat tepat waktu lebih utama —
+Selamat datang di Masjid Jami' Baitul Muttaqin — Sholat tepat waktu lebih utama —
 </span>
 </div>
 
@@ -195,16 +193,15 @@ setInterval(()=>{
     "id-ID-u-ca-islamic",{day:"numeric",month:"long",year:"numeric"}
   ).format(n).replace("AH","H")
 },1000)
-
 /* HARI BESAR ISLAM */
 const hariBesar=[
-{n:"Isra Mi'raj Nabi ﷺ",m:1,d:27},
-{n:"Awal Ramadhan",m:3,d:1},
-{n:"Nuzulul Qur'an",m:3,d:17},
-{n:"Idul Fitri",m:4,d:10},
-{n:"Idul Adha",m:6,d:17},
-{n:"Tahun Baru Islam",m:7,d:7},
-{n:"Maulid Nabi ﷺ",m:9,d:16}
+  {n:"Isra Mi'raj Nabi (ﷺ)",m:1,d:16},
+  {n:"Awal Ramadhan",m:2,d:19},
+  {n:"Nuzulul Qur'an",m:3,d:07},
+  {n:"Idul Fitri",m:3,d:20},
+  {n:"Idul Adha",m:5,d:27},
+  {n:"Tahun Baru Islam",m:6,d:16},
+  {n:"Maulid Nabi (ﷺ)",m:8,d:25}
 ]
 
 function updateHariBesar(){
@@ -219,6 +216,7 @@ function updateHariBesar(){
   hariBesarText.textContent=`Menuju ${dekat.n} — ${sel} hari lagi`
 }
 updateHariBesar()
+
 
 /* JADWAL SHOLAT + COUNTDOWN */
 let jadwal=null
@@ -280,7 +278,7 @@ setInterval(()=>{
 },1000)
 
 /* BACKGROUND SLIDE */
-const bg=["masjid1.jpg","masjid2.jpg"]
+const bg=["sudimara.jpg","masjid2.jpg"]
 let i=0
 setInterval(()=>{
   document.body.style.backgroundImage=`url('${bg[i]}')`
