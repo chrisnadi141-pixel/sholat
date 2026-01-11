@@ -2,36 +2,18 @@
 <html lang="id">
 <head>
 <meta charset="utf-8">
-<meta name="viewport"
-      content="width=device-width,
-               initial-scale=1.0,
-               maximum-scale=1.0,
-               user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Display Jadwal Sholat - Masjid Jami' Baitul Muttaqin</title>
 
 <style>
-/* FULLSCREEN & LOCK */
-html, body {
+body{
   margin:0;
-  padding:0;
-  width:100%;
-  height:100%;
-  overflow:hidden;
-  font-family:Arial, sans-serif;
-  color:white;
-  text-shadow:1px 2px 4px rgba(0,0,0,.7);
+  padding:20px;
   background:url("masjid2.jpg") no-repeat center center fixed;
   background-size:cover;
-}
-
-/* WRAPPER LAYOUT */
-#fullscreen{
-  width:100%;
-  height:100%;
-  display:flex;
-  flex-direction:column;
-  padding:20px;
-  box-sizing:border-box;
+  color:white;
+  font-family:Arial, sans-serif;
+  text-shadow:1px 2px 4px rgba(0,0,0,.7);
 }
 
 /* HEADER */
@@ -42,6 +24,7 @@ html, body {
   background:rgba(0,0,0,.45);
   padding:20px 30px;
   border-radius:18px;
+  margin-bottom:25px;
 }
 
 #jamDigital{
@@ -52,10 +35,18 @@ html, body {
 }
 
 .header-center{text-align:center}
-#masjidName{font-size:2.6rem;font-weight:900}
+
+#masjidName{
+  font-size:2.6rem;
+  font-weight:900;
+}
 
 /* ALAMAT BERJALAN */
-#alamatWrapper{overflow:hidden;white-space:nowrap;margin-top:6px}
+#alamatWrapper{
+  overflow:hidden;
+  white-space:nowrap;
+  margin-top:6px;
+}
 #alamatMasjid{
   display:inline-block;
   padding-left:100%;
@@ -85,58 +76,49 @@ html, body {
   color:#ffd966;
 }
 
-/* FLEX AREA UNTUK MENDORONG BAGIAN BAWAH */
-#spacer{
-  flex:1;
-}
-
-/* AREA SHOLAT & COUNTDOWN (DI BAWAH) */
-#sholatArea{
-  margin-bottom:70px; /* Jarak dari running text */
-}
-
-/* COUNTDOWN */
+/* INFO COUNTDOWN */
 #infoBox{
   background:rgba(0,0,0,.45);
   padding:20px;
   border-radius:18px;
   max-width:620px;
-  margin:10px auto;
+  margin:15px auto;
   text-align:center;
 }
-#countdown{font-size:2rem;font-weight:700}
+#countdown{
+  font-size:2rem;
+  font-weight:700;
+}
 
-/* TABLE SHOLAT */
+/* TABLE */
 table{
   width:100%;
   max-width:700px;
-  margin:10px auto;
+  margin:auto;
   border-collapse:collapse;
   font-size:1.4rem;
 }
-th,td{padding:12px;background:rgba(0,0,0,.4)}
-
-/* RUNNING TEXT FIXED BOTTOM */
-#marqueeBox{
-  position:fixed;
-  bottom:0;
-  left:0;
-  width:100%;
-  background:rgba(0,0,0,.65);
-  padding:12px 0;
-  font-size:1.6rem;
-  overflow:hidden;
+th,td{
+  padding:12px;
+  background:rgba(0,0,0,.4);
 }
 
+/* MARQUEE */
+#marqueeBox{
+  background:rgba(0,0,0,.55);
+  padding:12px;
+  font-size:1.6rem;
+  margin-top:25px;
+  border-radius:8px;
+  overflow:hidden;
+}
 #marqueeText{
   display:inline-block;
   white-space:nowrap;
-  padding-left:100%;
   animation:jalan 18s linear infinite;
 }
-
 @keyframes jalan{
-  from{transform:translateX(0)}
+  from{transform:translateX(100%)}
   to{transform:translateX(-100%)}
 }
 </style>
@@ -144,11 +126,9 @@ th,td{padding:12px;background:rgba(0,0,0,.4)}
 
 <body>
 
-<div id="fullscreen">
-
 <!-- HEADER -->
 <div id="headerTop">
-  <div id="jamDigital"></div>
+  <div><div id="jamDigital"></div></div>
 
   <div class="header-center">
     <div id="masjidName">MASJID JAMI'<br>BAITUL MUTTAQIN</div>
@@ -158,95 +138,89 @@ th,td{padding:12px;background:rgba(0,0,0,.4)}
   </div>
 
   <div class="header-right">
-    <div id="tanggalDisplay"></div>
-    <marquee><div id="hijriDisplay"></div></marquee>
+   <marquee><div id="tanggalDisplay"></div></marquee>
+    <div id="hijriDisplay"></div>
+    
   </div>
 </div>
-
-<!-- HARI BESAR -->
+<!-- HARI BESAR ISLAM -->
 <div id="hariBesarBox">
   <span id="hariBesarText">Memuat hari besar Islam...</span>
 </div>
-
-<!-- SPACER FLEX UNTUK MENDORONG SHOLAT KE BAWAH -->
-<div id="spacer"></div>
-
-<!-- AREA SHOLAT + COUNTDOWN DI ATAS RUNNING TEXT -->
-<div id="sholatArea">
-
-  <div id="infoBox">
-    <div id="countdown">Memuat waktu sholat...</div>
-  </div>
-
-  <table id="jadwalTable">
-    <thead>
-      <tr>
-        <th>IMSAK</th>
-        <th>SUBUH</th>
-        <th>ZUHUR</th>
-        <th>ASAR</th>
-        <th>MAGHRIB</th>
-        <th>ISYA</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
-
-</div>
+<!-- COUNTDOWN SHOLAT -->
+<div id="infoBox">
+  <div id="countdown">Memuat waktu sholat...</div>
 </div>
 
-<!-- RUNNING TEXT PALING BAWAH -->
+<!-- TABEL SHOLAT -->
+<table id="jadwalTable">
+<thead>
+<tr>
+<th>IMSAK</th>
+<th>SUBUH</th>
+<th>ZUHUR</th>
+<th>ASAR</th>
+<th>MAGHRIB</th>
+<th>ISYA</th>
+</tr>
+</thead>
+<tbody></tbody>
+</table>
+
+<!-- RUNNING TEXT -->
 <div id="marqueeBox">
-  <span id="marqueeText">
-    Selamat datang di Masjid Jami' Baitul Muttaqin — Sholat tepat waktu lebih utama —
-  </span>
+<span id="marqueeText">
+Selamat datang di Masjid Jami' Baitul Muttaqin — Sholat tepat waktu lebih utama —
+Jadikan masjid sebagai rumah kedua kita — Semoga Allah memberkahi aktivitas kita —
+</span>
 </div>
 
 <audio id="adzanAudio" src="adzan.mp3" preload="auto"></audio>
 
 <script>
-/* KUNCI SCROLL & ZOOM */
-document.addEventListener('touchmove', e => e.preventDefault(), { passive:false });
-window.addEventListener('wheel', e => e.preventDefault(), { passive:false });
-
-/* JAM DIGITAL */
+/* JAM */
 setInterval(()=>{
-  const n=new Date();
-  jamDigital.textContent = `${String(n.getHours()).padStart(2,0)}:${String(n.getMinutes()).padStart(2,0)}:${String(n.getSeconds()).padStart(2,0)}`;
-},1000);
+  const n=new Date()
+  jamDigital.textContent=
+  `${String(n.getHours()).padStart(2,0)}:${String(n.getMinutes()).padStart(2,0)}`
+},1000)
 
 /* TANGGAL & HIJRI */
 setInterval(()=>{
-  const h=["Minggu","Senin","Selasa","Rabu","Kamis","Jumat","Sabtu"];
-  const b=["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des"];
-  const n=new Date();
-  tanggalDisplay.textContent=`${h[n.getDay()]}, ${n.getDate()} ${b[n.getMonth()]} ${n.getFullYear()}`;
-  hijriDisplay.textContent=new Intl.DateTimeFormat("id-ID-u-ca-islamic",{day:"numeric",month:"long",year:"numeric"}).format(n).replace("AH","H");
-},1000);
-
+  const h=["Minggu","Senin","Selasa","Rabu","Kamis","Jumat","Sabtu"]
+  const b=["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus",
+               "September","Oktober","November","Desember"]
+  const n=new Date()
+  tanggalDisplay.textContent=`${h[n.getDay()]}, ${n.getDate()} ${b[n.getMonth()]} ${n.getFullYear()}`
+  hijriDisplay.textContent=new Intl.DateTimeFormat(
+    "id-ID-u-ca-islamic",{day:"numeric",month:"long",year:"numeric"}
+  ).format(n).replace("AH","H")
+},1000)
 /* HARI BESAR ISLAM */
 const hariBesar=[
   {n:"Isra Mi'raj Nabi (ﷺ)",m:1,d:16},
   {n:"Awal Ramadhan",m:2,d:19},
-  {n:"Nuzulul Qur'an",m:3,d:7},
+  {n:"Nuzulul Qur'an",m:3,d:07},
   {n:"Idul Fitri",m:3,d:20},
   {n:"Idul Adha",m:5,d:27},
   {n:"Tahun Baru Islam",m:6,d:16},
   {n:"Maulid Nabi (ﷺ)",m:8,d:25}
-];
+]
 
 function updateHariBesar(){
-  const now=new Date(); now.setHours(0,0,0,0);
-  let dekat=null, sel=Infinity;
+  const now=new Date()
+  let dekat=null,sel=9999
   hariBesar.forEach(h=>{
-    let t=new Date(now.getFullYear(),h.m-1,h.d); t.setHours(0,0,0,0);
-    if(t<now) t.setFullYear(t.getFullYear()+1);
-    const s=Math.round((t-now)/86400000);
-    if(s<sel){ sel=s; dekat=h; }
-  });
-  hariBesarText.textContent = sel===0 ? `Hari ini ${dekat.n}` : `Menuju ${dekat.n} — ${sel} hari lagi`;
+    let t=new Date(now.getFullYear(),h.m-1,h.d)
+    if(t<now)t.setFullYear(t.getFullYear()+1)
+    let s=Math.ceil((t-now)/86400000)
+    if(s<sel){sel=s;dekat=h}
+  })
+  hariBesarText.textContent=`Menuju ${dekat.n} — ${sel} hari lagi`
 }
-updateHariBesar(); setInterval(updateHariBesar,3600000);
+updateHariBesar()
+
+
 /* JADWAL SHOLAT + COUNTDOWN */
 let jadwal=null
 let sudahAdzan={Subuh:false,Zuhur:false,Asar:false,Maghrib:false,Isya:false}
@@ -305,13 +279,15 @@ setInterval(()=>{
     sudahAdzan[next.n]=true
   }
 },1000)
+
 /* BACKGROUND SLIDE */
-const bg=["sudimara.jpg","masjid2.jpg"];
-let i=0;
+const bg=["sudimara.jpg","masjid2.jpg"]
+let i=0
 setInterval(()=>{
-  document.body.style.backgroundImage=`url('${bg[i]}')`;
-  i=(i+1)%bg.length;
-},15000);
+  document.body.style.backgroundImage=`url('${bg[i]}')`
+  i=(i+1)%bg.length
+},15000)
 </script>
+
 </body>
 </html>
