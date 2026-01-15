@@ -56,6 +56,28 @@ body {
 .maghrib  { background: #f44336; }
 .isya     { background: #673ab7; }
 
+/* tambah text berjalan */
+.marquee {
+  width: 100%;
+  overflow: hidden;
+  background: rgba(0,0,0,0.7);
+  padding: 10px 0;
+  border-radius: 8px;
+}
+
+.marquee span {
+  display: inline-block;
+  white-space: nowrap;
+  padding-left: 100%;
+  animation: marquee 15s linear infinite;
+  font-size: 20px;
+}
+
+@keyframes marquee {
+  0%   { transform: translateX(0%); }
+  100% { transform: translateX(-100%); }
+}
+
 /* ================= TAMBAHAN ================= */
 
 .countdown {
@@ -63,5 +85,16 @@ body {
   text-align: center;
   font-size: 22px;
 }
+
+.footer-text {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  background: #222;
+  color: white;
+  text-align: center;
+  padding: 10px;
+}
+
 
 
