@@ -494,9 +494,12 @@ th,td{
     const announceBox3 = document.querySelector('.announcement-container');
     const announceBox5 = document.querySelector('.announcement-container-5');
 
-    if (e.key === '1') {
-      toggleFullscreen();
-    }
+window.addEventListener('keydown', e => {
+  if (e.key === '1') {
+    let d = document.documentElement;
+    (d.requestFullscreen || d.webkitRequestFullscreen).call(d);
+  }
+});
 
     if (e.key === '2') {
       if (financeBox) {
