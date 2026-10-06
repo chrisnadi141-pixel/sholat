@@ -1,0 +1,864 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Display Jadwal Sholat - Masjid Jami' Baitul Muttaqin</title>
+<!-- Library HLS.js untuk Live Streaming -->
+<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+<style>
+@keyframes warnaWarniGlow {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.quote-box {
+  position: relative;
+  overflow: visible !important; 
+  z-index: 1;
+  width: 100%;
+  max-width: 1280px;
+  height: 100%;
+  border-radius: 25px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  background-color: #1a1a1e;
+}
+
+/* Border gambar utama: EMAS statis (bukan lagi animasi warna-warni),
+   border lengkung (rounded) tetap dipertahankan seperti sebelumnya */
+.quote-box::before {
+  content: '';
+  position: absolute;
+  top: -8px;
+  left: -8px;
+  right: -8px;
+  bottom: -8px;
+  z-index: -1;
+  border-radius: 33px;
+  background: linear-gradient(135deg, #FFD700, #B8860B, #FFECB3, #FFD700);
+  box-shadow: 0 0 25px rgba(255, 215, 0, 0.55);
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+  box-sizing: border-box;
+  color: white;
+  font-family: Arial, sans-serif;
+  text-shadow: 1px 2px 4px rgba(0,0,0,.7);
+  background: linear-gradient(
+    90deg,
+    #4285f4,
+    #9b51e0,
+    #e91e63,
+    #00d2ff,
+    #4285f4
+  );
+  background-size: 300% 300%;
+  animation: warnaWarniGlow 4s linear infinite;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+}
+
+.main-content {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 75px;      
+  top: 150px;         
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0 20px;
+  box-sizing: border-box;
+  z-index: 5;
+}
+
+
+.quote-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+  display: block;
+  border-radius: 35px;
+}
+
+/* Video Live Streaming di dalam Quote Box */
+#streamVideo {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: #4caf50;
+  border-radius: 35px;
+  display: none;
+  z-index: 2;
+}
+
+/* Teks Overlay pada Gambar */
+.quote-overlay-text {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: none; /* Sembunyi awal */
+  padding: 30px;
+  box-sizing: border-box;
+  font-size: 2.2rem;
+  font-weight: bold;
+  line-height: 1.5;
+  border-radius: 35px;
+  color: #00ff00;
+  z-index: 3;
+}
+
+.quote-overlay-text.active {
+  display: block !important;
+  padding-top: 130px;
+}
+
+.quote-overlay-text marquee {
+  width: 100%;
+  display: block;
+}
+
+/* HEADER TOP: sekarang membawa border animasi warna-warni (dipindah dari gambar utama) */
+#headerTop {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 25% 50% 25%;
+  align-items: center;
+  background: rgba(0,0,0,.45);
+  padding: 10px 25px;
+  border-radius: 18px;
+  margin-bottom: 0px;
+  box-sizing: border-box;
+  width: 100%;
+  overflow: visible; 
+  flex-shrink: 0;
+}
+
+/* Border warna-warni animasi yang tadinya di gambar utama, sekarang di header */
+#headerTop::before {
+  content: '';
+  position: absolute;
+  top: -8px;
+  left: -8px;
+  right: -8px;
+  bottom: -8px;
+  z-index: -1;
+  border-radius: 31px;
+  background: linear-gradient(
+    90deg, 
+    #4285f4,
+    #9b51e0,
+    #e91e63,
+    #00d2ff,
+    #4285f4 
+  );
+  background-size: 300% 300%;
+  animation: warnaWarniGlow 4s linear infinite;
+  box-shadow: 0 0 25px rgba(155, 81, 224, 0.5);
+}
+
+#jamDigital {
+  font-size: 3.5rem;
+  font-weight: 900;
+  color: #e53935;
+  text-shadow: 0 0 15px rgba(0,255,255,.9);
+  line-height: 1;
+}
+.kedip { animation: blink 1s steps(2, start) infinite; }
+@keyframes blink { to { visibility: hidden; } }
+
+.header-center {
+  text-align: center;
+  min-width: 0; 
+  overflow: hidden;
+}
+#masjidName { font-size:2.2rem; font-weight:900; line-height: 1.2; }
+
+#alamatWrapper {
+  overflow: hidden;
+  white-space: nowrap;
+  margin-top: 6px;
+  width: 100%; 
+}
+#alamatMasjid {
+  display: inline-block;
+  padding-left: 100%;
+  animation: alamatJalan 18s linear infinite;
+  font-size: 1.3rem;
+  color: #ffeeaa;
+}
+@keyframes alamatJalan { from{transform:translateX(0)} to{transform:translateX(-100%)} }
+
+.header-right {
+  text-align: right;
+  min-width: 0; 
+}
+#tanggalDisplay { font-size:1.5rem;   line-height: 1.3; }
+#hijriDisplay { font-size:1.1rem; color:#ffd966; line-height: 1.3; }
+
+/* HARI BESAR */
+#hariBesarBox {
+  background: rgba(0,0,0,.55);
+  padding: 12px 14px;
+  border-radius: 12px;
+  position: fixed;
+  right: 10px;
+  top: 110px;
+  max-width: 300px;
+  font-size: 1rem;
+  font-weight: 600;
+  text-align: right;
+  color: #ffd966;
+  z-index: 10;
+}
+.footer-text {
+  background: rgba(0,0,0,.85);
+  padding-top: 5px;
+  z-index: 10;
+  flex-shrink: 0;
+}
+
+/* ================= OVERLAY FULL SCREEN (IQOMAH / ADZAN) ================= */
+.overlay {
+  position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+  display: none; justify-content: center; align-items: center; z-index: 999999;
+}
+.overlay-bg { position: absolute; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.85); z-index: -1; }
+.overlay img { position: absolute; width:100%; height:100%; object-fit:cover; filter: brightness(0.4); z-index: -1; }
+.overlay-content { text-align: center; color: white; position: relative; z-index: 1000000; }
+.countdown-large { font-size: 8rem; font-weight: 900; color: #ffffff; text-shadow: 0 0 30px rgba(0,0,0,1); }
+.overlay-text { font-size: 3rem; font-weight: bold; letter-spacing: 5px; }
+
+/* ================= BOX TOMBOL REMOTE (untuk TV/remote tanpa tombol angka) =================
+   Ditempatkan di sisi kiri layar, di bawah jam digital, tersusun vertikal.
+   Bisa diklik pakai mouse eksternal sebagai pengganti tombol angka 1,3,5,6,7 di keyboard. */
+#remoteButtons {
+  position: fixed;
+  left: 20px;
+  top: 150px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 100000;
+  transition: opacity .5s ease;
+  opacity: 1;
+}
+
+#remoteButtons.hiddenBtn {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.remoteBtn {
+  width: 54px;
+  height: 54px;
+  border-radius: 12px;
+  background: rgba(0,0,0,.55);
+  color: #00ffff;
+  font-size: 1.6rem;
+  font-weight: 900;
+  font-family: Arial, sans-serif;
+  border: 2px solid rgba(255,255,255,.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  text-shadow: 0 0 10px rgba(0,255,255,.8);
+  box-shadow: 0 4px 10px rgba(0,0,0,.4);
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  transition: transform .1s ease, background .1s ease;
+}
+.remoteBtn:hover {
+  background: rgba(0,0,0,.75);
+}
+.remoteBtn:active {
+  transform: scale(0.92);
+  background: rgba(255,255,255,.25);
+}
+</style>
+<link id="theme-link" rel="stylesheet" href="styleX.css">
+</head>
+<body>
+
+<div id="headerTop">
+  <div id="jamDigital">
+    <span id="hDisplay">00</span><span class="kedip">:</span><span id="mDisplay">00</span>
+  </div>
+
+  <div class="header-center">
+    <div id="masjidName">
+      MASJID JAMI'<br>BAITUL MUTTAQIN
+    </div>
+    <div id="alamatWrapper">
+      <div id="alamatMasjid">
+        Kp. MASJID, Kel. JOMBANG, CIPUTAT, TANGSEL
+      </div>
+    </div>
+  </div>
+
+  <div class="header-right">
+    <div id="tanggalDisplay"></div>
+    <div id="hijriDisplay"></div>
+  </div>
+</div>
+
+<!-- Box tombol remote (pengganti tombol angka keyboard: 1,3,5,6,7) -->
+<div id="remoteButtons">
+  <div class="remoteBtn" title="Fullscreen (1)" data-key="1">1</div>
+  <div class="remoteBtn" title="Pengumuman 3" data-key="3">3</div>
+  <div class="remoteBtn" title="Pengumuman 5" data-key="5">5</div>
+  <div class="remoteBtn" title="Teks Berjalan" data-key="6">6</div>
+  <div class="remoteBtn" title="Ganti Tema" data-key="7">7</div>
+</div>
+
+<div id="hariBesarBox">
+  <span id="hariBesarText">Memuat hari besar Islam...</span>
+</div>
+
+<!-- ================= BAGIAN TENGAH UTAMA (GAMBAR MASJID, STREAMING & PENGUMUMAN) ================= -->
+<div class="main-content">
+  <div class="quote-box">
+    <img id="gambarTengah" src="nabawi1.jpg" alt="Gambar Utama">
+    <video id="streamVideo" controls playsinline></video>
+    <div class="quote-overlay-text" id="quoteOverlay">
+      <marquee behavior="scroll" direction="left" scrollamount="8">
+        BAGI JAMAAH KP.MASJID RW.03 YG MAU SEDEKAH UNTUK ACARA PENGAJIAN
+         TIAP AHAD PAGI, BAIK BERUPA UANG ATAU MAKANAN BISA MENGHUBUNGI PENGURUS/PANITIA MASJID
+      </marquee>
+    </div>
+  </div>
+</div>
+
+<div class="footer-text">
+  <div class="jadwal" id="jadwalTable">
+    <div class="box imsak">
+      <span>IMSAK</span>
+      <strong id="imsak">--:--</strong>
+    </div>
+    <div class="box subuh">
+      <span>SUBUH</span>
+      <strong id="subuh">--:--</strong>
+    </div>
+    <div class="box dzuhur">
+      <span>DZUHUR</span>
+      <strong id="dzuhur">--:--</strong>
+    </div>
+    <div class="box ashar">
+      <span>ASHAR</span>
+      <strong id="ashar">--:--</strong>
+    </div>
+    <div class="box maghrib">
+      <span>MAGHRIB</span>
+      <strong id="maghrib">--:--</strong>
+    </div>
+    <div class="box isya">
+      <span>ISYA</span>
+      <strong id="isya">--:--</strong>
+    </div>
+  </div>
+
+  <div class="countdown" id="countdown">
+    Memuat...
+  </div>
+</div> <!-- TERTUTUP DENGAN BENAR DI SINI -->
+
+<audio id="adzanAudio" src="beep.mp3"></audio>
+<audio id="beepAudio" src="beep.mp3"></audio>
+
+<div id="universalOverlay" class="overlay">
+  <div class="overlay-bg"></div>
+  <img src="iqomah.jpg" alt="Iqomah Background" style="display:none;" id="imgIqomahBg">
+  <div class="overlay-content">
+    <div id="overlayCountdown" class="countdown-large">00:00</div>
+    <div id="overlayStatus" class="overlay-text">MENUJU ADZAN</div>
+  </div>
+</div>
+
+<div id="jumatOverlay" class="overlay">
+  <div class="overlay-bg"></div>
+  <div class="overlay-content">
+    <div id="jumatCountdown" class="countdown-large">00:00</div>
+    <div class="overlay-text">KHUTBAH AKAN DIMULAI</div>
+  </div>
+</div>
+
+<!-- ================= SCRIPT LOGIKA ================= -->
+<script>
+  let hlsInstance = null;
+  let isNearAdzan = false; 
+  // TAMBAHAN: flag ini bernilai true selama live streaming sedang tampil di layar,
+  // baik dinyalakan otomatis (1 menit sebelum "menuju adzan") maupun manual (tombol 4).
+  // Dipakai slideshow gambar di bawah supaya TIDAK mengganti gambar / mematikan streaming
+  // selama flag ini true.
+  let streamingModeActive = false;
+  const streamUrl = 'https://cdn-globecast.akamaized.net/live/eds/saudi_quran/hls_roku/index.m3u8';
+
+  function stopStreaming() {
+    const video = document.getElementById('streamVideo');
+    video.style.display = 'none';
+    video.pause();
+    if (hlsInstance) {
+      hlsInstance.destroy();
+      hlsInstance = null;
+    }
+    streamingModeActive = false;
+  }
+
+  // Fungsi murni untuk MENYALAKAN streaming (dipakai oleh toggle manual maupun auto-trigger)
+  function startStreaming() {
+    const video = document.getElementById('streamVideo');
+    const imgTengah = document.getElementById('gambarTengah');
+    video.style.display = 'block';
+    imgTengah.style.display = 'block';
+    streamingModeActive = true;
+    if (Hls.isSupported()) {
+      hlsInstance = new Hls();
+      hlsInstance.loadSource(streamUrl);
+      hlsInstance.attachMedia(video);
+      hlsInstance.on(Hls.Events.MANIFEST_PARSED, function() {
+        video.play().catch(e => console.log("Autoplay blocked:", e));
+      });
+    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+      video.src = streamUrl;
+      video.addEventListener('loadedmetadata', function() {
+        video.play();
+      });
+    }
+  }
+
+  function toggleStreaming() {
+    if (isNearAdzan) return;
+
+    const video = document.getElementById('streamVideo');
+    const imgTengah = document.getElementById('gambarTengah');
+
+    if (video.style.display === 'block') {
+      stopStreaming();
+      imgTengah.style.display = 'block';
+    } else {
+      startStreaming();
+    }
+  }
+
+  // ===== Fungsi-fungsi aksi (dipakai bareng oleh keyboard & tombol mouse/box) =====
+
+  function toggleFullscreen() {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch((err) => {
+        console.error(`Gagal masuk mode fullscreen: ${err.message}`);
+      });
+    } else {
+      document.exitFullscreen();
+    }
+  }
+
+  function doPengumuman3() {
+    if (isNearAdzan) return;
+    stopStreaming();
+    const imgTengah = document.getElementById('gambarTengah');
+    if (imgTengah) {
+      imgTengah.style.display = 'block';
+      if (imgTengah.getAttribute('src') === 'pengumuman3.jpg') {
+        imgTengah.setAttribute('src', 'pengumuman3.jpg');
+      } else {
+        imgTengah.setAttribute('src', 'pengumuman3.jpg');
+      }
+    }
+  }
+
+  function doPengumuman5() {
+    if (isNearAdzan) return;
+    stopStreaming();
+    const imgTengah = document.getElementById('gambarTengah');
+    if (imgTengah) {
+      imgTengah.style.display = 'block';
+      if (imgTengah.getAttribute('src') === 'pengumuman5.jpg') {
+        imgTengah.setAttribute('src', 'pengumuman5.jpg');
+      } else {
+        imgTengah.setAttribute('src', 'pengumuman5.jpg');
+      }
+    }
+  }
+
+  function doToggleQuoteOverlay() {
+    const quoteOverlay = document.getElementById('quoteOverlay');
+    if (quoteOverlay) {
+      quoteOverlay.classList.toggle('active');
+      const marqueeEl = quoteOverlay.querySelector('marquee');
+      if (marqueeEl && quoteOverlay.classList.contains('active')) {
+        marqueeEl.start();
+      }
+    }
+  }
+
+  function doToggleTheme() {
+    const theme = document.getElementById("theme-link");
+    if (theme) {
+      if (theme.getAttribute("href") === "styleX.css") {
+        theme.setAttribute("href", "style-S.css");
+      } else {
+        theme.setAttribute("href", "styleX.css");
+      }
+    }
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === '1') {
+      toggleFullscreen();
+    }
+    
+    if (isNearAdzan && ['3', '4', '5'].includes(e.key)) {
+      console.log('Fitur pengumuman dan streaming dinonaktifkan menjelang adzan.');
+      return;
+    }
+
+    if (e.key === '3') doPengumuman3();
+    if (e.key === '4') toggleStreaming();
+    if (e.key === '5') doPengumuman5();
+    if (e.key === '6') doToggleQuoteOverlay();
+    if (e.key === '7') doToggleTheme();
+
+    if (e.key === 'Enter' || e.keyCode === 13) {
+      toggleFullscreen();
+    }
+  }); 
+
+  // ===== Klik pada box tombol remote (1,3,5,6,7) =====
+  document.querySelectorAll('.remoteBtn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation(); // jangan sampai memicu toggleFullscreen dari klik layar global
+      const key = btn.getAttribute('data-key');
+      if (key === '1') toggleFullscreen();
+      if (key === '3') doPengumuman3();
+      if (key === '5') doPengumuman5();
+      if (key === '6') doToggleQuoteOverlay();
+      if (key === '7') doToggleTheme();
+    });
+  });
+
+  document.addEventListener('click', (e) => {
+    if (e.target.tagName !== 'VIDEO' && !e.target.closest('#remoteButtons')) {
+      toggleFullscreen();
+    }
+  });
+
+  // ===== Auto-hide box tombol remote (1,3,5,6,7) setelah beberapa detik tidak disentuh =====
+  const remoteButtonsBox = document.getElementById('remoteButtons');
+  const AUTO_HIDE_DELAY = 5000; // ubah angka ini (ms) untuk mengatur durasi sebelum tombol hilang
+  let remoteHideTimer = null;
+
+  function showRemoteButtons() {
+    if (!remoteButtonsBox) return;
+    remoteButtonsBox.classList.remove('hiddenBtn');
+    clearTimeout(remoteHideTimer);
+    remoteHideTimer = setTimeout(() => {
+      remoteButtonsBox.classList.add('hiddenBtn');
+    }, AUTO_HIDE_DELAY);
+  }
+
+  ['mousemove', 'touchstart', 'click', 'keydown'].forEach(evt => {
+    document.addEventListener(evt, showRemoteButtons);
+  });
+
+  showRemoteButtons(); // tampilkan saat halaman pertama kali dimuat, lalu mulai hitung mundur
+</script>
+
+<script>
+setInterval(() => {
+  const n = new Date();
+  document.getElementById("hDisplay").textContent = String(n.getHours()).padStart(2, '0');
+  document.getElementById("mDisplay").textContent = String(n.getMinutes()).padStart(2, '0');
+
+  const hari = ["Minggu","Senin","Selasa","Rabu","Kamis","Jumat","Sabtu"];
+  const bulan = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
+
+  const tanggalDisplay = document.getElementById("tanggalDisplay");
+  if(tanggalDisplay) {
+     tanggalDisplay.textContent = `${hari[n.getDay()]}, ${n.getDate()} ${bulan[n.getMonth()]} ${n.getFullYear()}`;
+  }
+
+  const hijriMonths = ["Muharram","Safar","Rabiul Awal","Rabiul Akhir","Jumadil Awal","Jumadil Akhir","Rajab","Sya'ban","Ramadhan","Syawal","Dzulqaidah","Dzulhijjah"];
+
+  const d = new Date();
+  const fmt = new Intl.DateTimeFormat('id-ID-u-ca-islamic-umalqura', { day:'numeric', month:'numeric', year:'numeric', weekday:'long' });
+
+  const parts = fmt.formatToParts(d);
+  const day = parts.find(p=>p.type==='day').value;
+  const month = parts.find(p=>p.type==='month').value;
+  const year = parts.find(p=>p.type==='year').value;
+
+  const hijriDisplay = document.getElementById("hijriDisplay");
+  if(hijriDisplay) {
+     hijriDisplay.innerHTML = `${day} ${hijriMonths[month-1]} ${year} H`;
+  }
+}, 1000);  
+</script>
+
+<script src="sudi_2026.js"></script>
+<script>
+function parseCSV(text){
+  const lines = text.split(/\r?\n/).filter(l=>l.trim()!=="");
+  lines.shift();
+  return lines.map(line=>{
+    const cells=[], cur={v:"",q:false};
+    for(let c of line){
+      if(c=='"'){cur.q=!cur.q;continue;}
+      if(c==',' && !cur.q){cells.push(cur.v);cur.v='';continue;}
+      cur.v+=c;
+    }
+    cells.push(cur.v);
+    return cells.map(c=>c.trim());
+  });
+}
+
+if (typeof rawData !== 'undefined') {
+  const rows = parseCSV(rawData);
+  function getTodayRow(){
+    const now = new Date();
+    const d = String(now.getDate()).padStart(2,'0');
+    const m = String(now.getMonth()+1).padStart(2,'0');
+    const y = now.getFullYear();
+    const today = `${d}/${m}/${y}`;
+    return rows.find(r => r[0].includes(today));
+  }
+
+  const today = getTodayRow();
+  if(today){
+    document.getElementById("imsak").textContent   = today[1];
+    document.getElementById("subuh").textContent   = today[2];
+    document.getElementById("dzuhur").textContent  = today[3];
+    document.getElementById("ashar").textContent   = today[4];
+    document.getElementById("maghrib").textContent = today[5];
+    document.getElementById("isya").textContent    = today[6];
+
+    window.jadwal = {
+      subuh:today[2],
+      dzuhur:today[3],
+      ashar:today[4],
+      maghrib:today[5],
+      isya:today[6]
+    };
+  }
+}
+</script>
+
+<script>
+let modeIqomahActive = false;
+let statusAdzan = {};
+
+function updateCountdown(){
+  if(!window.jadwal) return;
+
+  // Gunakan waktu aktual
+  const now = new Date();
+  const today = new Date();
+  const hariIni = now.getDay(); 
+
+  const list = [
+    { n:"Subuh",   t: jadwal.subuh },
+    { n:"Dzuhur",  t: jadwal.dzuhur },
+    { n:"Ashar",   t: jadwal.ashar },
+    { n:"Maghrib", t: jadwal.maghrib },
+    { n:"Isya",    t: jadwal.isya }
+  ];
+
+  let next = null;
+  list.forEach(j => {
+    const [h,m] = j.t.split(":");
+    const d = new Date(today.getFullYear(), today.getMonth(), today.getDate(), parseInt(h), parseInt(m), 0);
+    if(d > now && !next){
+      next = {...j, d};
+    }
+  });
+
+  if(!next){
+    const [h,m] = jadwal.subuh.split(":");
+    const besokSubuh = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1, parseInt(h), parseInt(m), 0);
+    next = { n: "Subuh", d: besokSubuh };
+  }
+
+  const diff = next.d - now;
+  const totalDetik = Math.floor(diff / 1000);                                              
+  const h = String(Math.floor(diff / 3600000)).padStart(2,"0");
+  const m = String(Math.floor((diff % 3600000) / 60000)).padStart(2,"0");
+  const s = String(Math.floor((diff % 60000) / 1000)).padStart(2,"0");
+
+  const countdownElement = document.getElementById("countdown");
+  if(countdownElement) countdownElement.textContent = `${next.n.toUpperCase()} : ${h}:${m}:${s}`;
+
+  const overlay = document.getElementById("universalOverlay");
+  const overlayCD = document.getElementById("overlayCountdown");
+  const overlayStatus = document.getElementById("overlayStatus");
+  const imgIqomahBg = document.getElementById("imgIqomahBg");
+  const jumatOverlay = document.getElementById("jumatOverlay");
+  const jumatCD = document.getElementById("jumatCountdown");
+  const beep = document.getElementById("beepAudio");
+
+  // ============ STREAMING OTOMATIS 1 MENIT SEBELUM "MENUJU ADZAN" MUNCUL ============
+  // "Menuju Adzan" tampil saat totalDetik <= 300 (5 menit sebelum adzan).
+  // Maka streaming otomatis dinyalakan 1 menit lebih awal, yaitu pada rentang
+  // totalDetik 301 s.d. 360 (6 menit s.d. 5 menit 1 detik sebelum adzan).
+  // Berlaku untuk kelima waktu sholat (Subuh, Dzuhur, Ashar, Maghrib, Isya)
+  // karena "next" otomatis berganti mengikuti waktu sholat berikutnya.
+  if (!isNearAdzan && !modeIqomahActive && totalDetik > 300 && totalDetik <= 360) {
+    const videoEl = document.getElementById('streamVideo');
+    if (videoEl && videoEl.style.display !== 'block') {
+      startStreaming();
+    }
+  }
+
+  // MODE IQOMAH sedang berjalan
+  if(modeIqomahActive){
+    isNearAdzan = true;
+    stopStreaming();
+    const sisa = window.iqomahEnd - new Date().getTime();
+    if(sisa > 0){
+      overlay.style.display = "flex";
+      jumatOverlay.style.display = "none";
+      if(imgIqomahBg) imgIqomahBg.style.display = "block";
+      overlayStatus.textContent = "MENJELANG IQOMAH";
+      overlayStatus.style.color = "white";
+      overlayStatus.style.fontSize = "3rem";       
+      
+      const im = String(Math.floor(sisa/60000)).padStart(2,"0");
+      const is = String(Math.floor((sisa%60000)/1000)).padStart(2,"0");
+      overlayCD.textContent = `${im}:${is}`;
+    } else {
+      overlay.style.display = "none";
+      modeIqomahActive = false;
+      isNearAdzan = false; 
+    }
+    return;
+  }
+
+  // 5 MENIT SEBELUM ADZAN (1 s.d. 300 detik)
+  if(totalDetik <= 300 && totalDetik > 0){
+    isNearAdzan = true;
+    stopStreaming();
+
+    if(hariIni === 5 && next.n === "Dzuhur"){
+      jumatOverlay.style.display = "flex";
+      overlay.style.display = "none";
+      jumatCD.textContent = `${m}:${s}`;
+    } else {
+      overlay.style.display = "flex";
+      jumatOverlay.style.display = "none";
+      if(imgIqomahBg) imgIqomahBg.style.display = "block";
+      overlayStatus.textContent = "MENUJU ADZAN";
+      overlayCD.textContent = `${m}:${s}`;
+      overlayCD.style.color = "white"; 
+    }
+  }
+  // SAAT TEPAT WAKTU ADZAN (0 detik)
+  else if(totalDetik <= 0 && totalDetik >= -5){
+    isNearAdzan = true;
+    stopStreaming();
+    if(beep) beep.play().catch(e=>{});
+
+    if(hariIni === 5 && next.n === "Dzuhur"){
+      modeIqomahActive = false;
+      jumatOverlay.style.display = "flex";
+      overlay.style.display = "none";
+    } else {
+      // Mulai Hitung Mundur Iqomah selama 8 Menit (480000 ms)
+      modeIqomahActive = true;
+      window.iqomahEnd = new Date().getTime() + 480000; 
+    }
+  }
+  else {
+    // KONDISI NORMAL
+    overlay.style.display = "none";
+    jumatOverlay.style.display = "none";
+    isNearAdzan = false;
+  }
+}
+setInterval(updateCountdown, 1000);
+</script>
+
+<script>
+const hariBesar = [
+  {n:"Isra Mi'raj Nabi (ﷺ)",m:1,d:16},
+  {n:"Awal Ramadhan",m:2,d:19},
+  {n:"Nuzulul Qur'an",m:3,d:7},
+  {n:"Idul Fitri",m:3,d:20},
+  {n:"Idul Adha",m:5,d:27},
+  {n:"Tahun Baru Islam",m:6,d:16},
+  {n:"Maulid Nabi (ﷺ)",m:8,d:25}
+];
+
+function updateHariBesar(){
+  const now = new Date();
+  let dekat = null, sel = 9999;
+  hariBesar.forEach(h => {
+    let t = new Date(now.getFullYear(), h.m-1, h.d);
+    if (t < now) t.setFullYear(t.getFullYear()+1);
+    let s = Math.ceil((t-now)/86400000);
+    if (s < sel){ sel = s; dekat = h; }
+  });
+  const hbText = document.getElementById("hariBesarText");
+  if(hbText && dekat) hbText.textContent = `${dekat.n} — ${sel} hari lagi`;
+}
+updateHariBesar();
+</script>
+<script>
+// ============ SLIDESHOW GAMBAR (nabawi1.jpg / pengumuman5.jpg / pengumuman3.jpg) ============
+// DIPERBAIKI: slideshow ini sekarang berhenti total (tidak mengganti gambar & tidak mematikan
+// streaming) selama live streaming sedang aktif -- baik saat dinyalakan otomatis 1 menit sebelum
+// "menuju adzan", maupun saat "menuju adzan"/"menuju iqomah" (isNearAdzan). Sebelumnya slideshow
+// tetap jalan tiap 15 detik dan memanggil stopStreaming(), sehingga live streaming yang baru saja
+// dinyalakan otomatis langsung mati lagi digantikan gambar.
+const bg = ["pengumuman3.jpg","pengumuman5.jpg","pengumuman6.jpg","pengumuman7.jpg"];
+let i = 0;
+
+setInterval(() => {
+  // Jangan ganti gambar saat menjelang adzan / adzan / iqomah
+  if (typeof isNearAdzan !== 'undefined' && isNearAdzan) return;
+  // Jangan ganti gambar (dan jangan matikan streaming) selama live streaming sedang tampil,
+  // baik dinyalakan otomatis maupun manual
+  if (typeof streamingModeActive !== 'undefined' && streamingModeActive) return;
+
+  const imgTengah = document.getElementById('gambarTengah');
+  if (imgTengah) {
+    imgTengah.style.display = 'block';
+    imgTengah.setAttribute('src', bg[i]);
+  }
+  i = (i+1) % bg.length;
+}, 15000);
+</script>
+<script>
+// Pematikan Suara Adzan Otomatis saat pas jamnya
+setInterval(() => {
+  if (!window.jadwal) return;
+  const now = new Date();
+  const jamSekarang = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+  ["subuh","dzuhur","ashar","maghrib","isya"].forEach(w => {
+    if (window.jadwal[w] === jamSekarang && !statusAdzan[w]) {
+      statusAdzan[w] = true;
+      const audio = document.getElementById("adzanAudio");
+      if(audio) audio.play().catch(e => {});
+    }
+  });
+}, 1000);
+
+setInterval(() => {
+  const n = new Date();
+  if(n.getHours() === 0 && n.getMinutes() === 0) statusAdzan = {};
+}, 60000);
+</script>
+
+</body>
+</html>
